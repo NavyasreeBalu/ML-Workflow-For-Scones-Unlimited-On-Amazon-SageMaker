@@ -1,13 +1,13 @@
 {
   "Comment": "A description of my state machine",
-  "StartAt": "Serialize Image Data",
+  "StartAt": "Image Serializer",
   "States": {
-    "Serialize Image Data": {
+    "Image Serializer": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Output": "{% $states.result.Payload %}",
       "Arguments": {
-        "FunctionName": "arn:aws:lambda:us-east-1:575108959171:function:serializeImageData:$LATEST",
+        "FunctionName": "arn:aws:lambda:us-east-1:575108959171:function:ImageSerializer:$LATEST",
         "Payload": {
           "s3_bucket.$": "$.s3_bucket",
           "s3_key.$": "$.s3_key"
@@ -27,15 +27,15 @@
           "JitterStrategy": "FULL"
         }
       ],
-      "Next": "classifyImage"
+      "Next": "Image Classifier"
     },
-    "classifyImage": {
+    "Image Classifier": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Output": "{% $states.result.Payload %}",
       "Arguments": {
-        "FunctionName": "arn:aws:lambda:us-east-1:575108959171:function:classifyImage:$LATEST",
-        "Payload.$": "$"
+        "FunctionName": "arn:aws:lambda:us-east-1:575108959171:function:ImageClassifier:$LATEST",
+        "Payload.$": "$.body"
       },
       "Retry": [
         {
@@ -51,15 +51,15 @@
           "JitterStrategy": "FULL"
         }
       ],
-      "Next": "filterInferences"
+      "Next": "Inference Filter"
     },
-    "filterInferences": {
+    "Inference Filter": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Output": "{% $states.result.Payload %}",
       "Arguments": {
-        "FunctionName": "arn:aws:lambda:us-east-1:575108959171:function:filterInferences:$LATEST",
-        "Payload.$": "$"
+        "FunctionName": "arn:aws:lambda:us-east-1:575108959171:function:InferenceFilter:$LATEST",
+        "Payload.$": "$.body"
       },
       "Retry": [
         {
